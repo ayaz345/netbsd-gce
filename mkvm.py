@@ -15,16 +15,15 @@ def find_latest_release(branch, arch):
   """
   conn = ftplib.FTP('nyftp.netbsd.org')
   conn.login()
-  conn.cwd('/pub/NetBSD-daily/%s' % branch)
+  conn.cwd(f'/pub/NetBSD-daily/{branch}')
   releases = conn.nlst()
   releases.sort(reverse=True)
   for r in releases:
     archs = conn.nlst(r)
     if not archs:
       next
-    has_arch = [a for a in archs if a.endswith(arch)]
-    if has_arch:
-      return "https://nycdn.netbsd.org/pub/NetBSD-daily/%s/%s/" % (branch, has_arch[0])
+    if has_arch := [a for a in archs if a.endswith(arch)]:
+      return f"https://nycdn.netbsd.org/pub/NetBSD-daily/{branch}/{has_arch[0]}/"
 
 
 arch = sys.argv[1]
@@ -48,10 +47,11 @@ EOF""",
 
 a = anita.Anita(
     anita.URL(find_latest_release(branch, arch)),
-    workdir="work-%s-%s" % (branch, arch),
+    workdir=f"work-{branch}-{arch}",
     disk_size=disk_size,
     memory_size="1G",
-    persist=True)
+    persist=True,
+)
 child = a.boot()
 anita.login(child)
 
